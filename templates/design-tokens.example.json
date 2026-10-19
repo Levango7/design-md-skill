@@ -1,0 +1,68 @@
+{
+  "$comment": "design-md scaffold.py 输入示例（双主题，全部通过 WCAG AA）。字段：color / colorLight（{value, role} 或纯 hex 字符串）；font.family / font.size / font.weight；radius；spacing；zIndex；shadow。直接运行： python3 scripts/scaffold.py --tokens templates/design-tokens.example.json --out ./design-out",
+  "name": "Acme Explorer",
+  "color": {
+    "bg": { "value": "#0A0C10", "role": "页面背景" },
+    "surface": { "value": "#111418", "role": "卡片 / 容器" },
+    "surface-2": { "value": "#161A20", "role": "悬浮 / 次级表面" },
+    "border": { "value": "#232830", "role": "装饰性边框" },
+    "border-soft": { "value": "#1A1E24", "role": "行分隔" },
+    "border-strong": { "value": "#5A6370", "role": "可交互控件边界（≥3:1）" },
+    "fg": { "value": "#E6E9EF", "role": "主文本" },
+    "fg-2": { "value": "#AEB4C0", "role": "次级文本" },
+    "muted": { "value": "#8B93A1", "role": "辅助 / 元数据" },
+    "accent": { "value": "#8B96FF", "role": "品牌文字 / 链接 / 激活（≥4.5:1）" },
+    "accent-solid": { "value": "#4B5AE0", "role": "品牌实底（配 accent-on ≥4.5:1）" },
+    "accent-solid-hover": { "value": "#4050CE" },
+    "accent-solid-active": { "value": "#3543B8" },
+    "accent-on": { "value": "#FFFFFF", "role": "accent 实底上的文字" },
+    "accent-soft": { "value": "#1B2033", "role": "品牌浅底（Badge）" },
+    "success": { "value": "#34D399" },
+    "success-soft": { "value": "#16312B" },
+    "warn": { "value": "#FBBF24" },
+    "warn-soft": { "value": "#342E1A" },
+    "danger": { "value": "#F87171" },
+    "danger-soft": { "value": "#342225" },
+    "danger-solid": { "value": "#B91C1C" },
+    "danger-on": { "value": "#FFFFFF" }
+  },
+  "colorLight": {
+    "bg": { "value": "#F7F8FA", "role": "页面背景" },
+    "surface": { "value": "#FFFFFF" },
+    "surface-2": { "value": "#EEF1F5" },
+    "border": { "value": "#D8DEE6" },
+    "border-soft": { "value": "#E6EAEF" },
+    "border-strong": { "value": "#6B7480" },
+    "fg": { "value": "#181B20" },
+    "fg-2": { "value": "#3F4754" },
+    "muted": { "value": "#5F6875" },
+    "accent": { "value": "#3D4BC7" },
+    "accent-soft": { "value": "#E6E9FE" },
+    "success": { "value": "#0B6B45" },
+    "success-soft": { "value": "#DFF3E9" },
+    "warn": { "value": "#8A5A00" },
+    "warn-soft": { "value": "#FBF0D9" },
+    "danger": { "value": "#B42318" },
+    "danger-soft": { "value": "#FBE3E0" }
+  },
+  "font": {
+    "family": {
+      "sans": "\"Inter\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "mono": "\"JetBrains Mono\", ui-monospace, SFMono-Regular, monospace"
+    },
+    "size": {
+      "xs": "12px",
+      "sm": "13px",
+      "base": "14px",
+      "lg": "16px",
+      "xl": "20px",
+      "2xl": "24px",
+      "3xl": "30px"
+    },
+    "weight": { "regular": 400, "medium": 500, "semibold": 600, "bold": 700 }
+  },
+  "radius": { "sm": "8px", "md": "12px", "lg": "16px", "full": "9999px" },
+  "spacing": { "1": "4px", "2": "8px", "3": "12px", "4": "16px", "6": "24px", "8": "32px" },
+  "zIndex": { "sticky": 20, "dropdown": 40, "modal": 60, "toast": 80 },
+  "shadow": { "raised": "0 4px 12px rgb(0 0 0 / 0.25)" }
+}

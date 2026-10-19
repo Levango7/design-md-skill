@@ -1,0 +1,11 @@
+# 全仓文本以 LF 规范化（跨平台 agent / CI 一致）
+* text=auto eol=lf
+
+# 二进制
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
