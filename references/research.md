@@ -13,8 +13,17 @@
 | Fetch | `POST https://api.deepseek.com/v1/tools/fetch` | URL → Markdown 正文 |
 
 - 鉴权：`Authorization: Bearer $DEEPSEEK_API_KEY` + `Content-Type: application/json`
-- 计费：各 5 元/1000 次成功请求（返回 200 且产生结果才计费；失败/空结果不计费）
-- 限速：Search 100 QPS / Fetch 25 QPS（账号级）
+- 计费：Search / Fetch **各** 5 元 / 1000 次**成功**请求，按请求次数计费，与 token 用量 / 返回条数无关：
+  - **仅"HTTP 200 且产生结果"才计费**——Search 要求 `results` 非空，Fetch 要求返回网页正文；
+  - 请求失败、搜索无结果、超时**不计费**；`count` 只控制返回条数，不影响单次价格。
+- 限速（**账号级**，与使用哪个 API Key 无关，与模型并发限制相互独立；Search / Fetch 配额各自独立、互不占用）：
+
+  | API | QPS | 附加说明 |
+  |---|---|---|
+  | Search | 100 | 超限返回 `429` |
+  | Fetch | 25 | 另有**按目标域名**的 QPS 限制，超限同样 `429` |
+
+- 平台侧说明：在 DeepSeek Harness / Claude Code / Codex 中经 Server 端工具调用访问 Search/Fetch **当前未计费**，自北京时间 **2026-11-01 00:00** 起按次计费；本 skill 走直连 `api.deepseek.com`，按上表正常计费。
 
 > 本 skill 提供 `scripts/research.py` 封装以上两个端点：key 解析链
 > `--key-file` → `DEEPSEEK_API_KEY` → `DEEPSEEK_API_KEY_FILE` → `~/.deepseek/api_key`，

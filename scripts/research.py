@@ -18,7 +18,11 @@ Commands:
   fetch  --url URL [--out FILE|--md-dir DIR]        (--md-dir writes a .md file named after the page)
 
 Output: JSON on stdout unless --out given. Docs: https://api-docs.deepseek.com/zh-cn/guides/search/
-Billing: 5 CNY / 1000 successful requests per API. Retries: 408/429/5xx (3 attempts, backoff); 4xx no retry.
+Billing: 5 CNY / 1000 SUCCESSFUL requests per API (HTTP 200 + non-empty results only;
+failures/timeouts/empty results are free; count does not affect the price).
+Rate limits (account-level, key-agnostic, independent from model concurrency): Search 100 QPS,
+Fetch 25 QPS (+ per-domain QPS for Fetch); over-limit = HTTP 429 (retried with backoff below).
+Retries: 408/429/5xx (3 attempts, backoff); 4xx no retry.
 """
 from __future__ import annotations
 

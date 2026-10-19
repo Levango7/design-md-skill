@@ -1,7 +1,7 @@
 ---
 name: design-md
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
   requires:
     bins: ["python3"]
     optional: ["gh", "curl", "node"]
@@ -111,5 +111,5 @@ python3 scripts/wcag.py --pair "#E6E9EF:#0A0C10:4.5"         # 单对 hex 速查
 ## 与其他能力的关系
 
 - **awesome-design-md**（VoltAgent，MIT）：84 个真实站点的 DESIGN.md 分析集合。本 skill 提供 `fetch_ref.py` 一键取用；它是"参考素材库"，本 skill 是"工作流引擎"。
-- **DeepSeek Search/Fetch**：`https://api.deepseek.com/v1/tools/search|fetch`。设计研究阶段的实时网页检索与正文抓取（含 site:/lang:/after: 语法）。按次计费（5 元/1000 次）。本 skill 提供 `scripts/research.py` 封装调用（key 永不回显）。
+- **DeepSeek Search/Fetch**：`https://api.deepseek.com/v1/tools/search|fetch`。设计研究阶段的实时网页检索与正文抓取（含 site:/lang:/after: 语法）。按次计费（5 元/1000 次**成功**请求——仅"返回 200 且结果非空"计费，失败/超时/空结果不计费）。账号级限速 Search 100 QPS / Fetch 25 QPS（超出返回 429，`research.py` 自动退避重试）。本 skill 提供 `scripts/research.py` 封装调用（key 永不回显）。
 - **Google Stitch 官方 lint**（可选）：`npx @google/design.md lint DESIGN.md`。
