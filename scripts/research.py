@@ -2,6 +2,11 @@
 """
 DeepSeek Search / Fetch helper (design-md skill) — the API key is never echoed.
 
+BILLING CONSENT GATE (default OFF): Search/Fetch are billed APIs (5 CNY / 1000
+SUCCESSFUL requests each). This helper refuses to run unless --yes-billing is
+given (or env DEEPSEEK_BILLING_CONSENT=1) — ask your user first. Free fallbacks:
+scripts/extract.py (urllib) / scripts/fetch_ref.py.
+
 Key resolution order (first hit wins):
   1) --key-file PATH
   2) env DEEPSEEK_API_KEY                    (may be invisible to already-running processes)
@@ -12,7 +17,7 @@ Setup (run in YOUR terminal, key never leaves your machine):
     mkdir "%USERPROFILE%\\.deepseek" 2>nul
     notepad "%USERPROFILE%\\.deepseek\\api_key"      # paste the key as the only line, save
 
-Commands:
+Commands (all require --yes-billing or DEEPSEEK_BILLING_CONSENT=1 — billed APIs):
   check                                     verify the key works (1 minimal search request)
   search --query Q [--count N] [--need-content] [--ori-question S] [--out FILE]
   fetch  --url URL [--out FILE|--md-dir DIR]        (--md-dir writes a .md file named after the page)
@@ -153,6 +158,12 @@ def cmd_check(key: str, source: str) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description="DeepSeek Search/Fetch helper (key never echoed)")
     ap.add_argument("--key-file", help="path to a file containing only the API key")
+    ap.add_argument(
+        "--yes-billing",
+        action="store_true",
+        help="consent to billed calls (5 CNY / 1000 successful requests per API); "
+        "without it (or DEEPSEEK_BILLING_CONSENT=1) this tool refuses to run",
+    )
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("check", help="verify key works (1 minimal request)")
@@ -170,6 +181,20 @@ def main() -> int:
     pf.add_argument("--md-dir", help="write <md-dir>/<slug>.md instead of stdout")
 
     args = ap.parse_args()
+
+    # Billing consent gate — OFF by default (Search/Fetch are billed APIs).
+    if not (args.yes_billing or os.environ.get("DEEPSEEK_BILLING_CONSENT") == "1"):
+        print(
+            "BILLING CONSENT REQUIRED — DeepSeek Search/Fetch are billed APIs\n"
+            "(5 CNY / 1000 SUCCESSFUL requests each; failures/timeouts/empty results are free).\n"
+            "This helper is OFF by default to prevent accidental charges.\n"
+            "Ask your user to explicitly agree, then re-run with --yes-billing\n"
+            "or set env DEEPSEEK_BILLING_CONSENT=1.\n"
+            "Free fallbacks: scripts/extract.py (urllib fetch) / scripts/fetch_ref.py.",
+            file=sys.stderr,
+        )
+        return 3
+
     key, source = find_key(args.key_file)
     if not key:
         print(f"DeepSeek key {source}", file=sys.stderr)

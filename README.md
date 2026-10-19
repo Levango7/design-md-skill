@@ -21,7 +21,7 @@
 | 一键生成令牌工程 | `scripts/scaffold.py` | `tokens.css`（双形式令牌）+ `tailwind.extend.js` + `preview.html` + 对比度报告 |
 | WCAG 2.1 对比度门禁（可断 CI） | `scripts/wcag.py` | 通过/失败清单；exit code ≠ 0 即失败 |
 | 取用 84 个真实品牌 DESIGN.md 参考 | `scripts/fetch_ref.py` | `DESIGN.reference-<slug>.md` |
-| DeepSeek 联网研究（可选） | `scripts/research.py` | 实时搜索 / 整页抓取为 Markdown（key 只从本机文件读，**永不回显**） |
+| DeepSeek 联网研究（可选，**计费直连、默认关闭**） | `scripts/research.py` | 实时搜索 / 整页抓取为 Markdown（需用户显式同意后带 `--yes-billing`；key 只从本机文件读，**永不回显**） |
 
 ## 安装
 
@@ -33,7 +33,7 @@
 | **Claude Code** | 拷贝到 `~/.claude/skills/design-md/` |
 | **Cursor / 其他** | 把本目录（或至少 `SKILL.md`）接入其 rules / skills 机制，见各自文档 |
 
-**运行要求**：Python ≥ 3.9（仅标准库，无需 `pip install`）。可选：`gh` 或 `curl`（抓取参考站）、`DEEPSEEK_API_KEY`（联网研究，非必需，缺失时自动降级）。
+**运行要求**：Python ≥ 3.9（仅标准库，无需 `pip install`）。可选：`gh` 或 `curl`（抓取参考站）、`DEEPSEEK_API_KEY`（联网研究，非必需，缺失时自动降级；**研究默认关闭**——计费保护，需用户显式同意后带 `--yes-billing`）。
 
 ## 快速开始
 
@@ -50,9 +50,10 @@ python3 scripts/scaffold.py --tokens my-tokens.json --out ./design-out
 # 4) 验收：WCAG 2.1 对比度门禁（--strict 同时核算半透明横幅合成色）
 python3 scripts/wcag.py --tokens ./design-out/tokens.css --strict
 
-# 5)（可选）DeepSeek 联网研究
-python3 scripts/research.py check    # 验证 key（读本机文件，不回显）
-python3 scripts/research.py search --query "fintech dashboard design" --count 8
+# 5)（可选）DeepSeek 联网研究——付费直连（5 元/1000 次成功请求），默认关闭：
+#    仅当用户明确同意后，才带 --yes-billing 运行
+python3 scripts/research.py --yes-billing check    # 验证 key（读本机文件，不回显）
+python3 scripts/research.py --yes-billing search --query "fintech dashboard design" --count 8
 ```
 
 起手模板见 `templates/design-tokens.example.json`（双主题、全部通过 AA，照它改即可）。
@@ -75,7 +76,7 @@ design-md-skill/
 │   ├── scaffold.py   #   令牌 JSON → tokens.css / tailwind / preview
 │   ├── wcag.py       #   WCAG 2.1 对比度引擎（CI 门禁）
 │   ├── fetch_ref.py  #   awesome-design-md 参考库拉取
-│   └── research.py   #   DeepSeek Search/Fetch 封装（key 永不回显）
+│   └── research.py   #   DeepSeek Search/Fetch 封装（计费直连、默认关闭；key 永不回显）
 ├── references/       # spec（文件规范）/ lessons（真实生产审计教训）/
 │                     # verify（验收清单+CI 模板）/ research（研究方法）
 └── templates/        # 可直接跑通的输入示例
@@ -92,6 +93,7 @@ design-md-skill/
 ## 安全与边界
 
 - **API key 永不回显**：`research.py` 解析链 `--key-file` → `DEEPSEEK_API_KEY` → `DEEPSEEK_API_KEY_FILE` → `~/.deepseek/api_key`；全链路输出 `sk-***` 掩码。
+- **计费保护（默认关闭）**：`research.py` 未带 `--yes-billing`（且 `DEEPSEEK_BILLING_CONSENT != 1`）时**直接拒绝执行**（exit 3）——先向用户说明费用并取得明确同意，才可启用。
 - 抓取遵守 robots 与频率限制（最多 5 张样式表、单张 512KB 上限）。
 - **参考 ≠ 照抄**：参考库仅用于方法学习（层级、节奏、取舍）；商业项目注意商标与字体授权。
 

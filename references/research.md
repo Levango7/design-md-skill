@@ -29,6 +29,9 @@
 > `--key-file` → `DEEPSEEK_API_KEY` → `DEEPSEEK_API_KEY_FILE` → `~/.deepseek/api_key`，
 > **永不回显**（输出做 `sk-***` 掩码）；4xx 不重试、408/429/5xx 退避重试 3 次。
 > 密钥建议由用户在自己终端落盘：`notepad "%USERPROFILE%\.deepseek\api_key"`（仅一行 key）。
+> **计费保护（默认关闭）**：`research.py` 未带 `--yes-billing`（且环境变量
+> `DEEPSEEK_BILLING_CONSENT` 非 `1`）时**直接拒绝执行**（exit 3）——先向用户说明费用并取得
+> 明确同意，才可加旗标；opencode 等按量计费环境默认视为未同意。
 
 ### Search 请求
 
@@ -95,7 +98,7 @@ for item in r.json()["results"]:
 | 找公开令牌 | `"<品牌>" css variables colors site:github.com` |
 | 时效 | `after:2025 lang:zh,en` 控制新近度与语言 |
 
-> **没有 key 时的降级**：直接用本 harness 的 webfetch/内置抓取；`extract.py` 完全离线可用（urllib）。
+> **没有 key / 未获计费同意时的降级**（默认路径）：直接用本 harness 的 webfetch/内置抓取；`extract.py` 完全离线可用（urllib）。不主动启用 DeepSeek——除非用户明确同意计费。
 
 ---
 
