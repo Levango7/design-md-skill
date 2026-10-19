@@ -44,12 +44,33 @@ def mask(text: str) -> str:
     return SK_RE.sub("sk-***", text)
 
 
+def read_key_file(path: Path) -> str:
+    """Read a key file tolerating UTF-8 (BOM) and UTF-16.
+
+    Windows 常见坑：记事本/某些终端会把纯文本存成 UTF-16（首两字节 FF FE / FE FF），
+    或 PowerShell 5.1 的 `>` 重定向产生 UTF-16 LE（无 BOM，ASCII 字符间隔 \\x00）。
+    这里按字节特征探测，避免 UnicodeDecodeError。
+    """
+    raw = path.read_bytes()
+    if raw.startswith(b"\xff\xfe") or raw.startswith(b"\xfe\xff"):
+        return raw.decode("utf-16").strip()  # UTF-16 with BOM
+    if b"\x00" in raw[:64]:  # UTF-16 without BOM (heuristic: NULs among ASCII)
+        for enc in ("utf-16-le", "utf-16-be"):
+            try:
+                s = raw.decode(enc).strip()
+                if s and all(32 <= ord(c) < 127 for c in s):
+                    return s
+            except UnicodeDecodeError:
+                pass
+    return raw.decode("utf-8-sig").strip()
+
+
 def find_key(key_file: str | None) -> tuple[str | None, str]:
     """Return (key, human-readable source). Never prints the key itself."""
     if key_file:
         p = Path(key_file).expanduser()
         if p.is_file():
-            return p.read_text(encoding="utf-8-sig").strip(), f"--key-file {p}"
+            return read_key_file(p), f"--key-file {p}"
         return None, f"--key-file {p} (not found)"
     if os.environ.get("DEEPSEEK_API_KEY"):
         return os.environ["DEEPSEEK_API_KEY"].strip(), "env DEEPSEEK_API_KEY"
@@ -57,10 +78,10 @@ def find_key(key_file: str | None) -> tuple[str | None, str]:
     if env_file:
         p = Path(env_file).expanduser()
         if p.is_file():
-            return p.read_text(encoding="utf-8-sig").strip(), f"env DEEPSEEK_API_KEY_FILE -> {p}"
+            return read_key_file(p), f"env DEEPSEEK_API_KEY_FILE -> {p}"
     default = Path.home() / ".deepseek" / "api_key"
     if default.is_file():
-        return default.read_text(encoding="utf-8-sig").strip(), f"key file {default}"
+        return read_key_file(default), f"key file {default}"
     return None, (
         "not found. Set it up in your own terminal (key never echoed here):\n"
         '  mkdir "%USERPROFILE%\\.deepseek" 2>nul\n'

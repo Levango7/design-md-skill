@@ -1,7 +1,7 @@
 ---
 name: design-md
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   requires:
     bins: ["python3"]
     optional: ["gh", "curl", "node"]
